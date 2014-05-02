@@ -25,6 +25,6 @@ class Edge {
 
 class WeightedEdge extends Edge {
     num weight = 0;
-    WeightedEdge(Vertex vertex_1, Vertex vertex_2, this.weight, {this.directed}) :
+    WeightedEdge(Vertex vertex_1, Vertex vertex_2, this.weight, {bool directed}) :
       super(vertex_1, vertex_2, directed: directed);
 }

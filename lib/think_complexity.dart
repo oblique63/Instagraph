@@ -26,7 +26,7 @@ valid_regular_degrees(int graph_vertices) {
 
 
 const int
-GRAPH_VERTEX_COUNT = 6;
+GRAPH_VERTEX_COUNT = 9;
 
 const List vertex_names = const ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'];
 

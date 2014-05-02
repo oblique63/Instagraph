@@ -114,63 +114,48 @@ class Graph {
         ||  degree <= 0)
             throw "Invalid degree";
 
-        //if (degree > 1) {
+        if (degree > 1) {
             //add_edge( new Edge(vertex_list.last, vertex_list.first) );
-        //}
+        }
 
         for (int i = 0; i < vertex_count; i++) {
             Vertex v1 = vertex_list[i];
 
             var degree_count = degree_of(v1);
-            /*
-            if (vertex_count.isOdd) {
-                // 1 to account for the previous vertex that was already connected to v1
-                // in the previous [outer loop] iteration.
-                //degree_count = degree_of(v1);
-                //add_edge(new Edge(v1, vertex_list[i+1]));
-                //degree_count += 1;
 
-                for (int j = i + 1; degree_count < degree && j < vertex_count; j+=1) {
-                    Vertex v2 = vertex_list[j];
-
-                    add_edge(new Edge(v1, v2));
-                    degree_count += 1;
-                }
+            var start_step, increment_by;
+            if (vertex_count.isEven && degree.isOdd) {
+                start_step = 1;
+                increment_by = 1;
             }
-            else {*/
-                var start_step, increment_by;
-                if (vertex_count.isEven && degree.isOdd) {
-                    start_step = 1;
-                    increment_by = 1;
-                }
-                else if (vertex_count.isEven && degree.isEven) {
-                    start_step = 1;
-                    increment_by = 2;
-                }
-                else if (vertex_count.isOdd && degree.isOdd) {
-                    start_step = 2;
-                    increment_by = 1;
-                }
-                else if (vertex_count.isOdd && degree.isEven) {
-                    start_step = 3;
-                    increment_by = 1;
-                }
+            else if (vertex_count.isEven && degree.isEven) {
+                start_step = 1;
+                increment_by = 2;
+            }
+            else if (vertex_count.isOdd && degree == vertex_count-1) {
+                start_step = 1;
+                increment_by = 1;
+            }
+            else if (vertex_count.isOdd && degree.isEven) {
+                start_step = 3;
+                increment_by = 2;
+            }
 
-                //if (degree == vertex_count-1)
-                //    increment_by = 1;
-                //else
-                //    increment_by = 2;
+            //if (degree == vertex_count-1)
+            //    increment_by = 1;
+            //else
+            //    increment_by = 2;
 
-                for (int j = i+start_step; degree_count < degree; j+=increment_by) {
-                    Vertex v2;
+            for (int j = i+start_step; degree_count < degree; j+=increment_by) {
+                Vertex v2;
 
-                    if (j >= vertex_count) {
-                        if (j/vertex_count >= 2) break;
-                        //print("i = $i, j = $j = ${j%vertex_count}");
+                if (j >= vertex_count) {
+                    if (j/vertex_count >= 2) break;
+                    //print("i = $i, j = $j = ${j%vertex_count}");
 
-                        v2 = vertex_list[j-vertex_count];
-                    }
-                    else {
+                    v2 = vertex_list[j-vertex_count];
+                }
+                else {
                         v2 = vertex_list[j];
                     }
 
