@@ -5,26 +5,6 @@ part 'edge.dart';
 part 'graph.dart';
 part 'random_graph.dart';
 
-List<int>
-valid_regular_degrees(int graph_vertices) {
-    assert(graph_vertices > 1);
-
-    List valid_degrees = [];
-    int degree_increment;
-
-    if (graph_vertices.isEven)
-        degree_increment = 1;
-    else
-        degree_increment = 2;
-
-    for (int i = degree_increment; i < graph_vertices; i += degree_increment) {
-        valid_degrees.add(i);
-    }
-
-    return valid_degrees;
-}
-
-
 const int
 GRAPH_VERTEX_COUNT = 9;
 
@@ -36,7 +16,7 @@ main() {
     var g = new Graph(vertices);
     print("Edge-less Graph with ${g.vertices.length} vertices\n");
 
-    for (int degrees in valid_regular_degrees(g.vertices.length)) {
+    for (int degrees in g.possible_regular_degrees) {
         print('Adding Regular Edges with $degrees Degrees...');
         g.add_regular_edges(degrees);
 

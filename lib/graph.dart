@@ -33,7 +33,7 @@ class Graph {
 
     bool get
     is_complete =>
-        is_regular && degree_of(vertices.first) == vertices.length-1;
+        degree_of(vertices.first) == vertices.length-1 && is_regular;
 
     List<Vertex>
     out_vertices(Vertex vertex) => _graph[vertex].keys.toList();
@@ -166,6 +166,27 @@ class Graph {
                 }
             //}
         }
+    }
+
+    List<int> get
+    possible_regular_degrees {
+        int graph_vertices = vertices.length;
+
+        assert(graph_vertices > 1);
+
+        List valid_degrees = [];
+        int degree_increment;
+
+        if (graph_vertices.isEven)
+            degree_increment = 1;
+        else
+            degree_increment = 2;
+
+        for (int i = degree_increment; i < graph_vertices; i += degree_increment) {
+            valid_degrees.add(i);
+        }
+
+        return valid_degrees;
     }
 
     operator

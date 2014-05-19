@@ -1,8 +1,8 @@
 library graphing;
 
-import '../think_complexity.dart';
 import 'dart:math';
 import 'dart:html';
+import 'package:ThinkComplexity/think_complexity.dart';
 
 part 'graph_canvas.dart';
 part 'layout.dart';

@@ -31,4 +31,7 @@ class Coordinate {
     int x, y;
 
     Coordinate(this.x, this.y);
+
+    Coordinate
+    offset(int x_offset, int y_offset) => new Coordinate(x+x_offset, y+y_offset);
 }
