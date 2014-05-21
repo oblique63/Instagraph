@@ -1,5 +1,6 @@
 part of graphing;
 
+/// Handles the 2D spatial layout of Vertices in a Graph
 abstract class Layout {
     Map<Vertex, Coordinate> points = {};
 
@@ -25,6 +26,10 @@ abstract class Layout {
 
         return temp.map((v) => v[1]);
     }
+
+    /// Only needs to be called when a Graph's Vertex count has changed
+    void
+    recalculate(Graph graph);
 }
 
 class Coordinate {
@@ -33,5 +38,5 @@ class Coordinate {
     Coordinate(this.x, this.y);
 
     Coordinate
-    offset(int x_offset, int y_offset) => new Coordinate(x+x_offset, y+y_offset);
+    offsetBy(int x_offset, int y_offset) => new Coordinate(x+x_offset, y+y_offset);
 }

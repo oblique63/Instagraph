@@ -4,24 +4,35 @@ import 'dart:html';
 
 
 const int
-GRAPH_VERTEX_COUNT = 7;
+GRAPH_VERTEX_COUNT = 6;
 
-const List vertex_names = const
-['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'];
+const List
+VERTEX_NAMES = const
+    [ 'a','b','c','d','e','f','g','h','i','j','k','l','m',
+      'n','o','p','q','r','s','t','u','v','w','x','y','z' ];
+
+List<Vertex>
+vertices =
+    new List.generate(GRAPH_VERTEX_COUNT, (i) => new Vertex(VERTEX_NAMES[i]) );
 
 
 main() {
-    List<Vertex> vertices =
-            new List.generate(GRAPH_VERTEX_COUNT, (index) => new Vertex(vertex_names[index]) );
+        Graph graph = new Graph(vertices);
 
-    Graph g = new Graph(vertices);
-    g.add_all_edges();
+        CanvasElement canvas = document.querySelector("#stage");
+        GraphCanvas graph_canvas = new GraphCanvas(canvas);
 
-    CircleLayout layout = new CircleLayout(g);
+        graph.add_all_edges();
+        CircleLayout layout = new CircleLayout(graph);
 
-    CanvasElement canvas = document.querySelector("#stage");
+        graph_canvas.show_edges(graph, layout)
+        .then((_) {
+            graph..remove_all_edges()
+                 ..add_regular_edges(4);
 
-    GraphCanvas graph_canvas = new GraphCanvas(canvas);
-
-    graph_canvas.show_graph(g, layout);
+            return graph_canvas.highlight_edges(graph.edges, layout, 'red');
+        })
+        .then((_) {
+            graph_canvas.show_vertices(graph, layout);
+        });
 }

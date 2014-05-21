@@ -87,6 +87,12 @@ class Graph {
     }
 
     void
+    remove_all_edges() {
+        _graph.values.forEach(
+            (Map<Vertex, Edge> map) => map.clear() );
+    }
+
+    void
     add_all_edges() {
         List<Vertex> vertex_list = _graph.keys.toList(growable: false);
 
