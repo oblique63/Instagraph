@@ -12,7 +12,8 @@ SelectElement
     degrees_select;
 InputElement
     edge_color_picker,
-    complete_graph_checkbox;
+    complete_graph_checkbox,
+    hide_vertices_checkbox;
 ButtonElement
     generate_graph_button;
 CanvasElement
@@ -25,6 +26,7 @@ main() {
     degrees_select = document.querySelector("#regular_degrees");
     edge_color_picker = document.querySelector("#edge_color");
     complete_graph_checkbox = document.querySelector("#complete_graph");
+    hide_vertices_checkbox = document.querySelector("#hide_vertices");
     generate_graph_button = document.querySelector("#generate_graph");
     canvas = document.querySelector("#stage");
     graph_canvas = new GraphCanvas(canvas);
@@ -49,6 +51,9 @@ selectedEdgeColor => edge_color_picker.value;
 bool get
 showCompleteGraph => complete_graph_checkbox.checked;
 
+bool get
+showVertices => !hide_vertices_checkbox.checked;
+
 _optionFor(option_content) => new OptionElement()..innerHtml = "$option_content"
                                                     ..value = "$option_content";
 
@@ -70,7 +75,7 @@ drawRegularGraph(int vertex_count, int degree) {
 
     graph_canvas.clear();
 
-    if (degree == 0) {
+    if (degree == 0 && showVertices) {
         graph_canvas.show_vertices(graph, layout);
     }
     else {
@@ -82,7 +87,9 @@ drawRegularGraph(int vertex_count, int degree) {
             return graph_canvas.highlight_edges(graph.edges, layout, selectedEdgeColor);
         })
         .then((_) {
-            graph_canvas.show_vertices(graph, layout);
+            if (showVertices) {
+                graph_canvas.show_vertices(graph, layout);
+            }
         });
     }
 }

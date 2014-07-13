@@ -10,13 +10,13 @@ class GraphCanvas {
       x_offset,
       y_offset;
     num
-      vertex_radius = 25,
+      vertex_radius = 22,
       edge_width = 2.5;
     String
       edge_color = '#000',
       vertex_color = 'yellow',
       label_color = '#937',
-      label_font = 'italic 20pt Calibri',
+      label_font = 'italic 18pt Calibri',
       canvas_background = "#fff";
 
     GraphCanvas(CanvasElement canvas) {
@@ -66,8 +66,8 @@ class GraphCanvas {
     }
 
     Future
-    highlight_vertices(List<Vertex> vertices, Layout layout, String line_color, [String fill_color = 'yellow']) {
-        return Future.forEach(vertices, (vertex) => draw_vertex(vertex, layout, line_color: line_color, fill_color: fill_color));
+    highlight_vertices(List<Vertex> vertices, Layout layout, String outline_color, [String fill_color = 'yellow']) {
+        return Future.forEach(vertices, (vertex) => draw_vertex(vertex, layout, outline_color: outline_color, fill_color: fill_color));
     }
 
 
@@ -80,9 +80,9 @@ class GraphCanvas {
     }
 
     Future
-    draw_vertex(Vertex vertex, Layout layout, {int radius: 25, String fill_color: 'yellow', String line_color: 'black'}) {
+    draw_vertex(Vertex vertex, Layout layout, {int radius: 25, String fill_color: 'yellow', String outline_color: 'black'}) {
         Coordinate position = layout.positionOf(vertex).offsetBy(x_offset, y_offset);
-        return _circle(position, radius, fill_color, line_color);
+        return _circle(position, radius, fill_color, outline_color);
 
     }
 
