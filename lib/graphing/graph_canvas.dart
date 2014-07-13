@@ -15,7 +15,9 @@ class GraphCanvas {
     String
       edge_color = '#000',
       vertex_color = 'yellow',
-      label_color = '#b59';
+      label_color = '#937',
+      label_font = 'italic 20pt Calibri',
+      canvas_background = "#fff";
 
     GraphCanvas(CanvasElement canvas) {
         width = canvas.width;
@@ -23,9 +25,6 @@ class GraphCanvas {
         x_offset = (width/2).ceil();
         y_offset = (height/2).ceil();
         context = canvas.context2D;
-
-        context..fillStyle = "#fff"
-               ..lineWidth = 1;
     }
 
     Future
@@ -126,7 +125,7 @@ class GraphCanvas {
         return new Future(() {
             context..beginPath()
                    ..fillStyle = color
-                   ..font = 'italic 20pt Calibri'
+                   ..font = label_font
                    ..textAlign = "center"
                    ..textBaseline = "middle"
                    ..fillText(text, position.x, position.y)

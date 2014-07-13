@@ -50,7 +50,7 @@ bool get
 showCompleteGraph => complete_graph_checkbox.checked;
 
 _optionFor(option_content) => new OptionElement()..innerHtml = "$option_content"
-                                                   ..value = "$option_content";
+                                                    ..value = "$option_content";
 
 onSetVertexCount(_) {
     List degrees = Graph.possible_regular_degrees_for(selectedVertexCount);
