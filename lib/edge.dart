@@ -3,10 +3,8 @@ part of think_complexity;
 class Edge {
     List<Vertex>
       _vertices;
-    bool
-      directed = false;
 
-    Edge(Vertex vertex_1, Vertex vertex_2, {this.directed}) {
+    Edge(Vertex vertex_1, Vertex vertex_2) {
         _vertices = [vertex_1, vertex_2];
     }
 
@@ -19,15 +17,15 @@ class Edge {
     Vertex get
     v2 => _vertices[1];
 
+    int get
+    hashCode => int.parse("${v1.hashCode}${v2.hashCode}");
+
     String
     toString() => "Edge(${_vertices[0]}, ${_vertices[1]})";
 
+    // Order of vertices matters for the moment, but maybe it shouldn't (unless Edge is Directed)...
     bool operator
-    == (Edge other) => (other.directed == this.directed) && other._vertices == this._vertices;
+    == (Edge other) => other._vertices == this._vertices;
 }
 
-class WeightedEdge extends Edge {
-    num weight = 0;
-    WeightedEdge(Vertex vertex_1, Vertex vertex_2, {this.weight, bool directed}) :
-        super(vertex_1, vertex_2, directed: directed);
-}
+// TODO: eventually support Directed and Weighted Edges

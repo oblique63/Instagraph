@@ -1,6 +1,7 @@
 part of think_complexity;
 
 class Graph {
+    // TODO: eventually make this support a List of Edges to allow for directional grahps
     Map< Vertex, Map<Vertex, Edge> >
       _graph_map = {};
 
@@ -46,13 +47,21 @@ class Graph {
     bool get
     is_empty => _graph_map.isEmpty;
 
+    List<int> get
+    possible_regular_degrees => possible_regular_degrees_for(vertex_count);
+
+    operator
+    [](Vertex vertex) => _graph_map[vertex];
+
+    String
+    toString() => "Graph($_graph_map)";
+
     bool
     contains_vertex(Vertex vertex) => _graph_map.containsKey(vertex);
 
     bool
-    _contains_reference(Vertex key, Vertex reference) {
+    _contains_reference(Vertex key, Vertex reference) =>
         _graph_map[key].containsKey(reference);
-    }
 
     List<Vertex>
     out_vertices(Vertex vertex) => _graph_map[vertex].keys.toList();
@@ -98,6 +107,11 @@ class Graph {
     }
 
     void
+    clear() {
+        _graph_map.clear();
+    }
+
+    void
     add_edge(Edge edge) {
         Vertex v1 = edge.v1;
         Vertex v2 = edge.v2;
@@ -115,6 +129,7 @@ class Graph {
             _graph_map[edge.v1].remove(edge.v2);
             _graph_map[edge.v2].remove(edge.v1);
         }
+        else throw "Edge not in graph";
     }
 
     void
@@ -140,8 +155,8 @@ class Graph {
 
     void
     add_regular_edges([int degree=2]) {
-        if (!is_valid_regular_degree(degree))
-            throw "Invalid degree";
+        if (!is_valid_regular_degree(degree, vertex_count))
+            throw "Invalid Degree";
 
         for (Vertex vertex in vertices) {
             _connect_to_nearest_neighbors(vertex, degree);
@@ -150,13 +165,6 @@ class Graph {
                 _connect_to_opposite_vertex(vertex);
             }
         }
-    }
-
-    bool
-    is_valid_regular_degree(int degree) {
-        return degree < vertex_count
-            &&  degree > 0
-            && !(degree.isOdd && vertex_count.isOdd);
     }
 
     void
@@ -212,13 +220,17 @@ class Graph {
         add_edge( new Edge(vertex, vertices[opposite_index]) );
     }
 
-    Map<int, int> get
-    possible_regular_degrees_and_edges => possible_regular_degrees_and_edges_for(vertex_count);
+    static bool
+    is_valid_regular_degree(int degree, int vertex_count) {
+        return degree < vertex_count
+            &&  degree > 0
+            && !(degree.isOdd && vertex_count.isOdd);
+    }
 
-    static Map<int, int>
-    possible_regular_degrees_and_edges_for(int vertex_count) {
+    static List<int>
+    possible_regular_degrees_for(int vertex_count) {
         int degree_step;
-        Map valid_degrees = {};
+        List valid_degrees = [];
 
         if (vertex_count > 1) {
             if (vertex_count.isEven)
@@ -227,16 +239,24 @@ class Graph {
                 degree_step = 2;
 
             for (int i = degree_step; i < vertex_count; i += degree_step) {
-                valid_degrees[i] = 0; // TODO: calculate edge count
+                valid_degrees.add(i);
             }
         }
 
         return valid_degrees;
     }
 
-    operator
-    [](Vertex vertex) => _graph_map[vertex];
+    static int
+    regular_edge_count_for(int vertex_count, int degree) {
+        if (!is_valid_regular_degree(degree, vertex_count))
+            throw "Invalid Vertex Count and/or Degree";
 
-    String
-    toString() => "Graph($_graph_map)";
+        num edge_count = 0;
+        num edges_to_add = vertex_count / 2;
+        for (int i = 0; i < degree; i++) {
+            edge_count += edges_to_add;
+        }
+
+        return edge_count.toInt();
+    }
 }

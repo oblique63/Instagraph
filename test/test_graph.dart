@@ -101,6 +101,9 @@ addRemoveEdges() {
     test("Remove Edges", () {
 
     });
+    test("Mathematical Edge Count Estimation", () {
+
+    });
 }
 
 testDegrees() {
@@ -113,18 +116,24 @@ testCompleteness() {
     test("Is Complete", _testIsComplete);
     test("Add All Edges", _testAddAllEdges);
 }
+
 _testIsComplete() {}
+
 _testAddAllEdges() {}
 
 testRegularity() {
     test("Possible Regular Degrees", _testPossibleRegularDegrees);
     test("Is Regular", _testIsRegular);
-    test("Add Regular Edges", _testAddingRegularEdges);
+    test("Add Valid Regular Edges", _testAddingValidRegularEdges);
+    test("Add Invalid Regular Edges", _testAddingInvalidRegularEdges);
 }
+
 _testPossibleRegularDegrees() {}
+
 _testIsRegular() {}
-_testAddingRegularEdges() {
-    int vertex_limit = 13;
+
+_testAddingValidRegularEdges() {
+    int vertex_limit = VERTEX_NAMES.length ~/ 2;
     List vertices = generateVertices(vertex_limit);
     graph = new Graph();
 
@@ -133,16 +142,31 @@ _testAddingRegularEdges() {
         _addEdgesForAllRegularDegrees();
     }
 }
-_addEdgesForAllRegularDegrees() {
-    Map<int, int> regular_degrees = graph.possible_regular_degrees_and_edges;
-    int vertex_count = graph.vertices.length;
-    int edge_count(int degree) => regular_degrees[degree];
 
-    for (int degree in regular_degrees.keys) {
+_addEdgesForAllRegularDegrees() {
+    List<int> regular_degrees = graph.possible_regular_degrees;
+
+    for (int degree in regular_degrees) {
+        graph.remove_all_edges();
         graph.add_regular_edges(degree);
+
         expect(graph.is_regular, isTrue);
-        //expect(graph.edges.length, edge_count(degree));
+        expect(graph.edge_count, Graph.regular_edge_count_for(graph.vertex_count, degree));
     }
+}
+
+_testAddingInvalidRegularEdges() {
+    int vertex_count = 5;
+    List vertices = generateVertices(vertex_count);
+
+    graph = new Graph(vertices);
+
+    expect(() => graph.add_regular_edges(vertex_count), throws,
+        reason: "Vertex degree must be smaller than vertex_count");
+    expect(() => graph.add_regular_edges(0), throws,
+        reason: "Vertex degree must be greater than 0");
+    expect(() => graph.add_regular_edges(3), throws,
+        reason: "Vertex degree must be even for odd vertex_count values");
 }
 
 
