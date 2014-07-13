@@ -16,7 +16,7 @@ main() {
     var g = new Graph(vertices);
     print("Edge-less Graph with ${g.vertices.length} vertices\n");
 
-    for (int degrees in g.possible_regular_degrees) {
+    for (int degrees in g.possible_regular_degrees_and_edges.keys) {
         print('Adding Regular Edges with $degrees Degrees...');
         g.add_regular_edges(degrees);
 

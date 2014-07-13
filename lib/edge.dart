@@ -21,10 +21,13 @@ class Edge {
 
     String
     toString() => "Edge(${_vertices[0]}, ${_vertices[1]})";
+
+    bool operator
+    == (Edge other) => (other.directed == this.directed) && other._vertices == this._vertices;
 }
 
 class WeightedEdge extends Edge {
     num weight = 0;
-    WeightedEdge(Vertex vertex_1, Vertex vertex_2, this.weight, {bool directed}) :
-      super(vertex_1, vertex_2, directed: directed);
+    WeightedEdge(Vertex vertex_1, Vertex vertex_2, {this.weight, bool directed}) :
+        super(vertex_1, vertex_2, directed: directed);
 }

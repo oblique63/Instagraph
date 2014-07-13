@@ -7,4 +7,11 @@ class Vertex {
 
     String
     toString() => "Vertex($label)";
+
+    get
+    hashCode =>
+        int.parse(label.codeUnits.join());
+
+    bool operator
+    == (Vertex other) => this.toString() == other.toString();
 }

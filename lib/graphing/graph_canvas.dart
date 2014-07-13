@@ -8,8 +8,10 @@ class GraphCanvas {
       height,
       // offset because Layout uses negative coordinates
       x_offset,
-      y_offset,
-      vertex_radius = 25;
+      y_offset;
+    num
+      vertex_radius = 25,
+      edge_width = 2.5;
     String
       edge_color = '#000',
       vertex_color = 'yellow',
@@ -27,18 +29,14 @@ class GraphCanvas {
     }
 
     Future
-    show_graph(Graph graph, Layout layout) {
-        return show_edges(graph, layout).then((_) =>
-                show_vertices(graph, layout)).then((_) =>
-                show_labels(graph, layout));
+    clear() => new Future(() => context.clearRect(0, 0, width, height));
 
-        /*
-        new Future(() {
-            graph.edges.forEach((edge) => draw_edge(edge, layout, color: edge_color));
-            graph.vertices..forEach((vertex) => draw_vertex(vertex, layout, radius: vertex_radius, color: vertex_color))
-                          ..forEach((vertex) => draw_label(vertex, layout, color: label_color));
-        });
-        */
+    Future
+    show_graph(Graph graph, Layout layout) {
+        return clear().then((_) =>
+                show_edges(graph, layout).then((_) =>
+                show_vertices(graph, layout)).then((_) =>
+                show_labels(graph, layout)));
     }
 
     Future
@@ -101,7 +99,7 @@ class GraphCanvas {
         return new Future(() {
             context..beginPath()
                    ..moveTo(start.x, start.y)
-                   ..lineWidth = 3
+                   ..lineWidth = edge_width
                    ..strokeStyle = color
                    ..lineTo(end.x, end.y)
                    ..stroke()

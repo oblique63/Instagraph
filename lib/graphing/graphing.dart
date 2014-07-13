@@ -3,7 +3,7 @@ library graphing;
 import 'dart:math';
 import 'dart:html';
 import 'dart:async';
-import 'package:ThinkComplexity/think_complexity.dart';
+import 'package:think_complexity/think_complexity.dart';
 
 part 'graph_canvas.dart';
 part 'layout.dart';

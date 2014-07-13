@@ -2,30 +2,38 @@ part of think_complexity;
 
 class Graph {
     Map< Vertex, Map<Vertex, Edge> >
-      _graph = {};
+      _graph_map = {};
 
+    // TODO: maybe allow initialization with ONLY edges...
     Graph([ List<Vertex> vertices = const [], List<Edge> edges = const [] ]) {
         vertices.forEach(add_vertex);
         edges.forEach(add_edge);
     }
 
     List<Vertex> get
-    vertices => _graph.keys.toList();
+    vertices => _graph_map.keys.toList();
+
+    int get
+    vertex_count => _graph_map.keys.length;
 
     List<Edge> get
     edges {
-        List<Edge> edges = [];
+        List<Edge> _edges = [];
 
-        for (Vertex v1 in _graph.keys) {
-            for (Vertex v2 in _graph[v1].keys) {
-                if (!edges.contains(_graph[v1][v2])) {
-                    edges.add(_graph[v1][v2]);
+        for (Vertex v1 in _graph_map.keys) {
+            for (Vertex v2 in _graph_map[v1].keys) {
+
+                if (!_edges.contains(_graph_map[v1][v2])) {
+                    _edges.add(_graph_map[v1][v2]);
                 }
             }
         }
 
-        return edges;
+        return _edges;
     }
+
+    int get
+    edge_count => edges.length;
 
     bool get
     is_regular =>
@@ -35,29 +43,58 @@ class Graph {
     is_complete =>
         degree_of(vertices.first) == vertices.length-1 && is_regular;
 
+    bool get
+    is_empty => _graph_map.isEmpty;
+
+    bool
+    contains_vertex(Vertex vertex) => _graph_map.containsKey(vertex);
+
+    bool
+    _contains_reference(Vertex key, Vertex reference) {
+        _graph_map[key].containsKey(reference);
+    }
+
     List<Vertex>
-    out_vertices(Vertex vertex) => _graph[vertex].keys.toList();
+    out_vertices(Vertex vertex) => _graph_map[vertex].keys.toList();
 
     List<Edge>
-    out_edges(Vertex vertex) => _graph[vertex].values.toList();
+    out_edges(Vertex vertex) => _graph_map[vertex].values.toList();
 
     int
     degree_of(Vertex vertex) => out_edges(vertex).length;
 
+    /// Works regardless of how Edges are directed/weighted
+    bool
+    vertices_are_connected(Vertex v1, Vertex v2) =>
+        contains_vertex(v1) && _graph_map[v2].containsKey(v1);
+
+    bool
+    contains_edge(Edge edge) => vertices_are_connected(edge.v1, edge.v2);
+
     Edge
     get_edge(Vertex v1, Vertex v2) {
-        if ( _graph.containsKey(v1)
-        &&   _graph[v1].containsKey(v2) ) {
-            return _graph[v1][v2];
+        if (vertices_are_connected(v1, v2)) {
+            return _graph_map[v1][v2];
         }
-        else {
-            return null;
-        }
+        else return null;
     }
 
     void
     add_vertex(Vertex vertex) {
-        _graph[vertex] = {};
+        _graph_map[vertex] = {};
+    }
+
+    void
+    add_vertex_if_absent(Vertex vertex) {
+        _graph_map.putIfAbsent(vertex, () => {});
+    }
+
+    void
+    remove_vertex(Vertex vertex) {
+        if (contains_vertex(vertex)) {
+            vertices.forEach((v) => _graph_map[v].remove(vertex));
+            _graph_map.remove(vertex);
+        }
     }
 
     void
@@ -65,139 +102,141 @@ class Graph {
         Vertex v1 = edge.v1;
         Vertex v2 = edge.v2;
 
-        if (!_graph.containsKey(v1)) {
-            add_vertex(v1);
-        }
-        if (!_graph.containsKey(v2)) {
-            add_vertex(v2);
-        }
+        add_vertex_if_absent(v1);
+        add_vertex_if_absent(v2);
 
-        _graph[v1][v2] = edge;
-        _graph[v2][v1] = edge;
+        _graph_map[v1][v2] = edge;
+        _graph_map[v2][v1] = edge;
     }
 
     void
     remove_edge(Edge edge) {
-        if (_graph.containsKey(edge.v1)
-        &&  _graph[edge.v1].containsKey(edge.v2)) {
-
-            _graph[edge.v1].remove(edge.v2);
-            _graph[edge.v2].remove(edge.v1);
+        if (contains_edge(edge)) {
+            _graph_map[edge.v1].remove(edge.v2);
+            _graph_map[edge.v2].remove(edge.v1);
         }
     }
 
     void
     remove_all_edges() {
-        _graph.values.forEach(
-            (Map<Vertex, Edge> map) => map.clear() );
+        _graph_map.values.forEach((Map<Vertex, Edge> map) => map.clear() );
     }
 
     void
     add_all_edges() {
-        List<Vertex> vertex_list = _graph.keys.toList(growable: false);
+       // Alternatively:
+       //add_regular_edges(vertices.length-1);
 
-        for (int i = 0; i < vertex_list.length-1; i++) {
-            Vertex v1 = vertex_list[i];
+        for (int i = 0; i < vertices.length-1; i++) {
+            Vertex v1 = vertices[i];
 
-            for (var j = i+1; j < vertex_list.length; j++) {
-                Vertex v2 = vertex_list[j];
+            for (var j = i+1; j < vertices.length; j++) {
+                Vertex v2 = vertices[j];
 
                 add_edge(new Edge(v1, v2));
             }
         }
-
-        // Alternatively:
-        //add_regular_edges(vertices.length-1);
     }
 
     void
     add_regular_edges([int degree=2]) {
-        var vertex_list = _graph.keys.toList();
-        var vertex_count = vertex_list.length;
-
-        if (degree > vertex_count-1
-        || (degree.isOdd && vertex_count.isOdd)
-        ||  degree <= 0)
+        if (!is_valid_regular_degree(degree))
             throw "Invalid degree";
 
-        if (degree > 1) {
-            //add_edge( new Edge(vertex_list.last, vertex_list.first) );
-        }
+        for (Vertex vertex in vertices) {
+            _connect_to_nearest_neighbors(vertex, degree);
 
-        for (int i = 0; i < vertex_count; i++) {
-            Vertex v1 = vertex_list[i];
-
-            var degree_count = degree_of(v1);
-
-            var start_step, increment_by;
-            if (vertex_count.isEven && degree.isOdd) {
-                start_step = 1;
-                increment_by = 1;
+            if (degree.isOdd) { // vertex_count is also even (required to be valid)
+                _connect_to_opposite_vertex(vertex);
             }
-            else if (vertex_count.isEven && degree.isEven) {
-                start_step = 1;
-                increment_by = 2;
-            }
-            else if (vertex_count.isOdd && degree == vertex_count-1) {
-                start_step = 1;
-                increment_by = 1;
-            }
-            else if (vertex_count.isOdd && degree.isEven) {
-                start_step = 3;
-                increment_by = 2;
-            }
-
-            //if (degree == vertex_count-1)
-            //    increment_by = 1;
-            //else
-            //    increment_by = 2;
-
-            for (int j = i+start_step; degree_count < degree; j+=increment_by) {
-                Vertex v2;
-
-                if (j >= vertex_count) {
-                    if (j/vertex_count >= 2) break;
-                    //print("i = $i, j = $j = ${j%vertex_count}");
-
-                    v2 = vertex_list[j-vertex_count];
-                }
-                else {
-                        v2 = vertex_list[j];
-                    }
-
-                    if (degree_of(v2) < degree && v1 != v2) {
-                        add_edge(new Edge(v1, v2));
-                        degree_count += 1;
-                    }
-                }
-            //}
         }
     }
 
-    List<int> get
-    possible_regular_degrees {
-        int graph_vertices = vertices.length;
+    bool
+    is_valid_regular_degree(int degree) {
+        return degree < vertex_count
+            &&  degree > 0
+            && !(degree.isOdd && vertex_count.isOdd);
+    }
 
-        assert(graph_vertices > 1);
+    void
+    _connect_to_nearest_neighbors(Vertex vertex, int degree) {
+        List<Vertex> neighbors = _find_neighbors_for(vertex, degree);
 
-        List valid_degrees = [];
-        int degree_increment;
+        neighbors.forEach((neighbor) => add_edge( new Edge(vertex, neighbor) ));
+    }
 
-        if (graph_vertices.isEven)
-            degree_increment = 1;
+    int
+    _get_furthest_neighbor_distance(int degree) {
+        int distance;
+        if (degree.isOdd)
+            distance = (degree-1) ~/ 2;
         else
-            degree_increment = 2;
+            distance = degree ~/ 2;
 
-        for (int i = degree_increment; i < graph_vertices; i += degree_increment) {
-            valid_degrees.add(i);
+        return distance;
+    }
+
+    List<Vertex>
+    _find_neighbors_for(Vertex vertex, int degree) {
+        int furthest_neighbor = _get_furthest_neighbor_distance(degree);
+        int root = vertices.indexOf(vertex);
+        List neighbors = [];
+
+        for (int distance = furthest_neighbor; distance > 0; distance--) {
+            int left_neighbor_index = root - distance;
+            int right_neighbor_index = root + distance;
+
+            if (left_neighbor_index < 0)
+                left_neighbor_index += vertex_count;
+
+            if (right_neighbor_index >= vertex_count)
+                right_neighbor_index -= vertex_count;
+
+            neighbors..add(vertices[left_neighbor_index])
+                     ..add(vertices[right_neighbor_index]);
+        }
+
+        return neighbors;
+    }
+
+    void
+    _connect_to_opposite_vertex(Vertex vertex) {
+        int origin_index = vertices.indexOf(vertex);
+        int opposite_distance = vertex_count ~/ 2;
+        int opposite_index = origin_index + opposite_distance;
+
+        if (opposite_index >= vertex_count)
+            opposite_index -= vertex_count;
+
+        add_edge( new Edge(vertex, vertices[opposite_index]) );
+    }
+
+    Map<int, int> get
+    possible_regular_degrees_and_edges => possible_regular_degrees_and_edges_for(vertex_count);
+
+    static Map<int, int>
+    possible_regular_degrees_and_edges_for(int vertex_count) {
+        int degree_step;
+        Map valid_degrees = {};
+
+        if (vertex_count > 1) {
+            if (vertex_count.isEven)
+                degree_step = 1;
+            else
+                degree_step = 2;
+
+            for (int i = degree_step; i < vertex_count; i += degree_step) {
+                valid_degrees[i] = 0; // calculate edge count
+            }
         }
 
         return valid_degrees;
     }
 
     operator
-    [](Vertex vertex) => _graph[vertex];
+    [](Vertex vertex) => _graph_map[vertex];
 
     String
-    toString() => "$_graph";
+    toString() => "Graph($_graph_map)";
 }
