@@ -227,7 +227,7 @@ class Graph {
                 degree_step = 2;
 
             for (int i = degree_step; i < vertex_count; i += degree_step) {
-                valid_degrees[i] = 0; // calculate edge count
+                valid_degrees[i] = 0; // TODO: calculate edge count
             }
         }
 

@@ -1,3 +1,5 @@
-name: ThinkComplexity
+name: think_complexity
+dev_dependencies:
+  unittest: any
 dependencies:
   browser: any
