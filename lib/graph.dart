@@ -174,17 +174,6 @@ class Graph {
         neighbors.forEach((neighbor) => add_edge( new Edge(vertex, neighbor) ));
     }
 
-    int
-    _get_furthest_neighbor_distance(int degree) {
-        int distance;
-        if (degree.isOdd)
-            distance = (degree-1) ~/ 2;
-        else
-            distance = degree ~/ 2;
-
-        return distance;
-    }
-
     List<Vertex>
     _find_neighbors_for(Vertex vertex, int degree) {
         int furthest_neighbor = _get_furthest_neighbor_distance(degree);
@@ -208,6 +197,17 @@ class Graph {
         return neighbors;
     }
 
+    int
+    _get_furthest_neighbor_distance(int degree) {
+        int distance;
+        if (degree.isOdd)
+            distance = (degree-1) ~/ 2;
+        else
+            distance = degree ~/ 2;
+
+        return distance;
+    }
+
     void
     _connect_to_opposite_vertex(Vertex vertex) {
         int origin_index = vertices.indexOf(vertex);
@@ -219,6 +219,7 @@ class Graph {
 
         add_edge( new Edge(vertex, vertices[opposite_index]) );
     }
+
 
     static bool
     is_valid_regular_degree(int degree, int vertex_count) {

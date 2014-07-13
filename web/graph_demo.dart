@@ -79,8 +79,6 @@ drawRegularGraph(int vertex_count, int degree) {
             graph..remove_all_edges()
                  ..add_regular_edges(degree);
 
-            print("Edges for $vertex_count vertices @ $degree: ${graph.edges.length}");
-
             return graph_canvas.highlight_edges(graph.edges, layout, selectedEdgeColor);
         })
         .then((_) {
