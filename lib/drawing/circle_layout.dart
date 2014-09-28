@@ -1,4 +1,4 @@
-part of graphing;
+part of instagraph.drawing;
 
 class CircleLayout extends Layout {
     int radius;

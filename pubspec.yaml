@@ -1,5 +1,10 @@
-name: think_complexity
+name: instagraph
+description: A graph (as in graph theory) plotting library
 dev_dependencies:
   unittest: any
+  #spec_dart: any
+  #dartmocks: any
+  #guinness: any
+
 dependencies:
   browser: any

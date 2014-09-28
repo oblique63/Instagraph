@@ -1,4 +1,4 @@
-part of think_complexity;
+part of instagraph;
 
 class Edge {
     List<Vertex>

@@ -1,6 +1,6 @@
 import 'package:unittest/unittest.dart';
 import 'package:unittest/vm_config.dart';
-import 'package:think_complexity/think_complexity.dart';
+import 'package:instagraph/instagraph.dart';
 
 const List
 VERTEX_NAMES = const
@@ -12,15 +12,15 @@ Graph graph;
 main() {
     useVMConfiguration();
 
-    group("Graph Initialization:", initializeGraphs);
-    group("Vertex Insertion + Removal:", addRemoveVertices);
-    group("Edge Insertion + Removal:", addRemoveEdges);
+    group("Graph Initialization:", testGraphInitializations);
+    group("Vertices:", testVertices);
+    group("Edges:", testEdges);
     group("Vertex Degrees:", testDegrees);
     group("Graph Completeness:", testCompleteness);
     group("Graph Regularity:", testRegularity);
 }
 
-initializeGraphs() {
+testGraphInitializations() {
     int vertex_count = 4;
     int edge_count = vertex_count-1;
     List<Vertex> vertices = generateVertices(vertex_count);
@@ -48,7 +48,7 @@ initializeGraphs() {
     });
 }
 
-addRemoveVertices() {
+testVertices() {
     Vertex v1 = new Vertex("v1");
     Vertex v2 = new Vertex("v2");
 
@@ -58,13 +58,15 @@ addRemoveVertices() {
         graph.add_vertex(v1);
         expect(graph.contains_vertex(v1), isTrue);
         expect(graph.vertices, [v1]);
+        equals(graph.vertex_count, 1);
 
         graph.add_vertex_if_absent(v1);
         expect(graph.vertices, [v1]);
 
-        graph.add_vertex_if_absent(v2);
-        graph.add_vertex_if_absent(v2);
+        graph..add_vertex_if_absent(v2)
+             ..add_vertex_if_absent(v2);
         expect(graph.vertices, [v1, v2]);
+        equals(graph.vertex_count, 2);
     });
     test("Remove Vertex", () {
         graph = new Graph([v1, v2]);
@@ -75,12 +77,19 @@ addRemoveVertices() {
 
         graph.remove_vertex(v2);
         expect(graph.vertices, isEmpty);
+        equals(graph.vertex_count, 0);
+        expect(graph.is_empty, isTrue);
+
+        graph..add_vertex(v1)
+             ..add_vertex(v2)
+             ..clear();
         expect(graph.is_empty, isTrue);
     });
 }
 
-addRemoveEdges() {
-    List vertices = generateVertices(3);
+testEdges() {
+    List vertices = generateVertices(4);
+    int max_possible_edges = 6;
     Edge e1 = new Edge(vertices[0], vertices[1]);
     Edge e2 = new Edge(vertices[1], vertices[2]);
 
@@ -88,21 +97,38 @@ addRemoveEdges() {
         graph = new Graph();
 
         graph.add_edge(e1);
-        expect(graph.contains_edge(e1), isTrue);
+        equals(graph.edge_count, 1);
         expect(graph.edges, [e1]);
 
         graph.add_edge(e1);
         expect(graph.edges, [e1]);
 
         graph.add_edge(e2);
-        expect(graph.contains_edge(e2), isTrue);
+        equals(graph.edge_count, 2);
         expect(graph.edges, [e1, e2]);
+
+        graph.add_all_edges();
+        equals(graph.edge_count, max_possible_edges);
+    });
+    test("Get Edges", () {
+        graph = new Graph(vertices, [e1]);
+
+        expect(graph.contains_edge(e1), isTrue);
+        expect(graph.contains_edge(e2), isFalse);
+        expect(graph.vertices_are_connected(e1.v1, e1.v2), isTrue);
+        expect(graph.get_edge(e1.v1, e1.v2), e1);
     });
     test("Remove Edges", () {
+        graph = new Graph(vertices, [e1, e2]);
 
-    });
-    test("Mathematical Edge Count Estimation", () {
+        graph.remove_edge(e1);
+        expect(graph.contains_edge(e1), isFalse);
+        expect(graph.edges, [e2]);
 
+        graph..add_all_edges()
+             ..remove_all_edges();
+        equals(graph.edge_count, 0);
+        expect(graph.is_empty, isFalse, reason: "Graph should still have vertices");
     });
 }
 
@@ -113,24 +139,43 @@ testDegrees() {
 }
 
 testCompleteness() {
-    test("Is Complete", _testIsComplete);
-    test("Add All Edges", _testAddAllEdges);
+    List vertices = generateVertices(4);
+    int max_possible_edges = 6;
+    Edge e1 = new Edge(vertices[0], vertices[1]);
+    Edge e2 = new Edge(vertices[1], vertices[2]);
+
+    test("Is Complete", () {
+        graph = new Graph(vertices, [e1]);
+        expect(graph.is_complete, isFalse);
+
+        graph.add_edge(e2);
+        expect(graph.is_complete, isFalse);
+
+        graph.add_all_edges();
+        expect(graph.is_complete, isTrue);
+        equals(graph.edge_count, max_possible_edges);
+    });
 }
-
-_testIsComplete() {}
-
-_testAddAllEdges() {}
 
 testRegularity() {
     test("Possible Regular Degrees", _testPossibleRegularDegrees);
+    test("Regular Edge Count Estimation", _testRegularEdgeCountEstimation);
     test("Is Regular", _testIsRegular);
     test("Add Valid Regular Edges", _testAddingValidRegularEdges);
     test("Add Invalid Regular Edges", _testAddingInvalidRegularEdges);
 }
 
-_testPossibleRegularDegrees() {}
+_testPossibleRegularDegrees() {
+    // TODO
+}
 
-_testIsRegular() {}
+_testRegularEdgeCountEstimation() {
+    // TODO
+}
+
+_testIsRegular() {
+    // TODO
+}
 
 _testAddingValidRegularEdges() {
     int vertex_limit = VERTEX_NAMES.length ~/ 2;
@@ -172,13 +217,13 @@ _testAddingInvalidRegularEdges() {
 
 List<Vertex>
 generateVertices(int vertex_count) {
-    assert(vertex_count < VERTEX_NAMES.length);
+    expect(vertex_count < VERTEX_NAMES.length, isTrue);
 
     return new List.generate(vertex_count, (i) => new Vertex(VERTEX_NAMES[i]) );
 }
 List<Edge>
 generateEdges(int edge_count) {
-    assert(edge_count < VERTEX_NAMES.length-1);
+    expect(edge_count < VERTEX_NAMES.length-1, isTrue);
 
     List vertices = generateVertices(edge_count+1);
     return new List.generate(edge_count, (i) => new Edge(vertices[i], vertices[i+1]));

@@ -1,4 +1,4 @@
-part of graphing;
+part of instagraph.drawing;
 
 /// Handles the 2D spatial layout of Vertices in a Graph
 abstract class Layout {

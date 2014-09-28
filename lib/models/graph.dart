@@ -1,4 +1,4 @@
-part of think_complexity;
+part of instagraph;
 
 class Graph {
     // TODO: eventually make this support a List of Edges to allow for directional grahps
@@ -14,23 +14,32 @@ class Graph {
     List<Vertex> get
     vertices => _graph_map.keys.toList();
 
+    void set
+    vertices(List<Vertex> new_vertices) {
+        clear();
+        new_vertices.forEach(add_vertex);
+    }
+
     int get
     vertex_count => _graph_map.keys.length;
 
     List<Edge> get
     edges {
-        List<Edge> _edges = [];
+        Set<Edge> edge_set = new Set();
 
         for (Vertex v1 in _graph_map.keys) {
             for (Vertex v2 in _graph_map[v1].keys) {
-
-                if (!_edges.contains(_graph_map[v1][v2])) {
-                    _edges.add(_graph_map[v1][v2]);
-                }
+                edge_set.add(_graph_map[v1][v2]);
             }
         }
 
-        return _edges;
+        return edge_set.toList();
+    }
+
+    void set
+    edges(List<Edge> new_edges) {
+        remove_all_edges();
+        new_edges.forEach(add_edge);
     }
 
     int get
@@ -42,7 +51,7 @@ class Graph {
 
     bool get
     is_complete =>
-        degree_of(vertices.first) == vertices.length-1 && is_regular;
+        (degree_of(vertices.first) == vertices.length-1) && is_regular;
 
     bool get
     is_empty => _graph_map.isEmpty;
@@ -107,9 +116,7 @@ class Graph {
     }
 
     void
-    clear() {
-        _graph_map.clear();
-    }
+    clear() => _graph_map.clear();
 
     void
     add_edge(Edge edge) {
@@ -133,14 +140,12 @@ class Graph {
     }
 
     void
-    remove_all_edges() {
-        _graph_map.values.forEach((Map<Vertex, Edge> map) => map.clear() );
-    }
+    remove_all_edges() => edges.forEach(remove_edge);
 
     void
     add_all_edges() {
        // Alternatively:
-       //add_regular_edges(vertices.length-1);
+       // add_regular_edges(vertices.length-1);
 
         for (int i = 0; i < vertices.length-1; i++) {
             Vertex v1 = vertices[i];
@@ -161,7 +166,7 @@ class Graph {
         for (Vertex vertex in vertices) {
             _connect_to_nearest_neighbors(vertex, degree);
 
-            if (degree.isOdd) { // vertex_count is also even (required to be valid)
+            if (degree.isOdd) { // implies that vertex_count is also even (required to be valid)
                 _connect_to_opposite_vertex(vertex);
             }
         }
@@ -177,21 +182,15 @@ class Graph {
     List<Vertex>
     _find_neighbors_for(Vertex vertex, int degree) {
         int furthest_neighbor = _get_furthest_neighbor_distance(degree);
-        int root = vertices.indexOf(vertex);
+        int root_index = vertices.indexOf(vertex);
         List neighbors = [];
 
         for (int distance = furthest_neighbor; distance > 0; distance--) {
-            int left_neighbor_index = root - distance;
-            int right_neighbor_index = root + distance;
+            int left_neighbor = _find_left_neighbor_index(root_index, distance);
+            int right_neighbor = _find_right_neighbor_index(root_index, distance);
 
-            if (left_neighbor_index < 0)
-                left_neighbor_index += vertex_count;
-
-            if (right_neighbor_index >= vertex_count)
-                right_neighbor_index -= vertex_count;
-
-            neighbors..add(vertices[left_neighbor_index])
-                     ..add(vertices[right_neighbor_index]);
+            neighbors..add(vertices[left_neighbor])
+                     ..add(vertices[right_neighbor]);
         }
 
         return neighbors;
@@ -206,6 +205,21 @@ class Graph {
             distance = degree ~/ 2;
 
         return distance;
+    }
+
+    int
+    _find_left_neighbor_index(int root, int distance) {
+        int index = root - distance;
+        if (index < 0)
+            index += vertex_count;
+        return index;
+    }
+    int
+    _find_right_neighbor_index(int root, int distance) {
+        int index = root + distance;
+        if (index >= vertex_count)
+            index -= vertex_count;
+        return index;
     }
 
     void
@@ -254,6 +268,7 @@ class Graph {
 
         num edge_count = 0;
         num edges_to_add = vertex_count / 2;
+
         for (int i = 0; i < degree; i++) {
             edge_count += edges_to_add;
         }

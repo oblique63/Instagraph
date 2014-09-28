@@ -1,5 +1,4 @@
-import 'package:think_complexity/graphing/graphing.dart';
-import 'package:think_complexity/think_complexity.dart';
+import 'package:instagraph/instagraph.dart';
 import 'dart:html';
 
 const List
@@ -22,16 +21,11 @@ GraphCanvas
     graph_canvas;
 
 main() {
-    vertices_select = document.querySelector("#vertex_count");
-    degrees_select = document.querySelector("#regular_degrees");
-    edge_color_picker = document.querySelector("#edge_color");
-    complete_graph_checkbox = document.querySelector("#complete_graph");
-    hide_vertices_checkbox = document.querySelector("#hide_vertices");
-    generate_graph_button = document.querySelector("#generate_graph");
-    canvas = document.querySelector("#stage");
+    _initSelectors();
+
     graph_canvas = new GraphCanvas(canvas);
 
-    List vertex_count_options = new List.generate(VERTEX_NAMES.length, (i) => _optionFor(i+1));
+    List vertex_count_options = new List.generate(VERTEX_NAMES.length, (i) => _createOptionFor(i+1));
 
     vertices_select..children = vertex_count_options
                    ..onChange.listen(onSetVertexCount);
@@ -54,12 +48,9 @@ showCompleteGraph => complete_graph_checkbox.checked;
 bool get
 showVertices => !hide_vertices_checkbox.checked;
 
-_optionFor(option_content) => new OptionElement()..innerHtml = "$option_content"
-                                                    ..value = "$option_content";
-
 onSetVertexCount(_) {
     List degrees = Graph.possible_regular_degrees_for(selectedVertexCount);
-    List degree_options = new List.generate(degrees.length, (i) => _optionFor(degrees[i]));
+    List degree_options = new List.generate(degrees.length, (i) => _createOptionFor(degrees[i]));
 
     degrees_select.children = degree_options;
 }
@@ -93,3 +84,17 @@ drawRegularGraph(int vertex_count, int degree) {
         });
     }
 }
+
+_initSelectors() {
+    vertices_select = document.querySelector("#vertex_count");
+    degrees_select = document.querySelector("#regular_degrees");
+    edge_color_picker = document.querySelector("#edge_color");
+    complete_graph_checkbox = document.querySelector("#complete_graph");
+    hide_vertices_checkbox = document.querySelector("#hide_vertices");
+    generate_graph_button = document.querySelector("#generate_graph");
+    canvas = document.querySelector("#stage");
+}
+
+_createOptionFor(option_content) =>
+    new OptionElement()..innerHtml = "$option_content"
+                         ..value = "$option_content";
