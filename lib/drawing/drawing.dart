@@ -3,7 +3,7 @@ library instagraph.drawing;
 import 'dart:math';
 import 'dart:html';
 import 'dart:async';
-import 'package:instagraph/instagraph.dart';
+import 'package:instagraph/models/models.dart';
 
 part 'graph_canvas.dart';
 part 'layout.dart';

@@ -1,4 +1,4 @@
-part of instagraph;
+part of instagraph.models;
 
 class Vertex {
     String label = '';

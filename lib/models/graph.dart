@@ -1,4 +1,4 @@
-part of instagraph;
+part of instagraph.models;
 
 class Graph {
     // TODO: eventually make this support a List of Edges to allow for directional grahps

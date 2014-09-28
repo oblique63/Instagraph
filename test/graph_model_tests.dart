@@ -1,6 +1,6 @@
 import 'package:unittest/unittest.dart';
 import 'package:unittest/vm_config.dart';
-import 'package:instagraph/instagraph.dart';
+import 'package:instagraph/models/models.dart';
 
 const List
 VERTEX_NAMES = const

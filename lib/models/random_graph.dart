@@ -1,4 +1,4 @@
-part of instagraph;
+part of instagraph.models;
 
 class RandomGraph extends Graph {
     // TODO
